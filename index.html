@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🎮 今日やるゲーム診断</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(135deg,#17172b,#24244a);color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.card{width:min(520px,100%);background:rgba(255,255,255,.09);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.15);border-radius:28px;padding:28px 22px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+h1{font-size:27px;margin:5px 0 10px}.sub{opacity:.75;font-size:14px;margin-bottom:28px}.q{font-size:23px;font-weight:700;line-height:1.5;min-height:105px;display:flex;align-items:center;justify-content:center}
+.buttons{display:grid;grid-template-columns:1fr 1fr;gap:12px}.btn{border:0;border-radius:18px;padding:17px;font-size:19px;font-weight:700;color:#fff;cursor:pointer}.yes{background:#2e8bff}.no{background:#555b72}.btn:active{transform:scale(.97)}
+.result-icon{font-size:58px}.result-title{font-size:25px;font-weight:800;margin:8px 0}.desc{opacity:.8;line-height:1.7;margin:12px 0 22px}.link,.retry{display:block;width:100%;padding:15px;border-radius:16px;text-decoration:none;font-weight:700;margin-top:10px}.link{background:#fff;color:#17172b}.retry{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.3)}
+.progress{height:5px;background:rgba(255,255,255,.12);border-radius:99px;margin-bottom:20px;overflow:hidden}.bar{height:100%;background:#fff;width:0%;transition:.25s}
+.small{font-size:12px;opacity:.55;margin-top:18px}
+</style>
+</head>
+<body>
+<div class="card" id="app"></div>
+<script>
+const games={
+peak:["PEAK","🧗","3人で協力して山を登る、短時間でも遊びやすいワイワイ系アクション.","https://store.steampowered.com/app/3527290/PEAK/",["coop","action","fun","explore"]],
+human:["Human: Fall Flat","🤸","ふにゃふにゃキャラで物理パズル。失敗そのものが笑いになる協力ゲーム.","https://store.steampowered.com/app/477160/Human_Fall_Flat/?l=japanese",["coop","puzzle","fun","casual"]],
+bigwalk:["Big Walk","🚶","友達と歩き回りながら遊ぶ、ゆるくて自由なコミュニケーション重視のゲーム.","https://store.steampowered.com/app/1478500/Big_Walk/",["coop","casual","explore","social"]],
+enshrouded:["Enshrouded ～霧の王国～","🏠","探索・戦闘・建築・クラフト・育成を長く楽しめるサバイバルRPG.","https://store.steampowered.com/app/1203620/Enshrouded/",["survival","build","rpg","action","explore","long"]],
+valheim:["Valheim","🪓","冒険、資源集め、拠点作り、ボス戦をじっくり楽しむサバイバル.","https://store.steampowered.com/app/892970/Valheim/?l=japanese",["survival","build","action","explore","long","hard"]],
+dragonwilds:["RuneScape: Dragonwilds","🐉","ファンタジー世界で探索・クラフト・戦闘を進めるサバイバル.","https://store.steampowered.com/app/1374490/RuneScape_Dragonwilds/",["survival","rpg","explore","action","long"]],
+bg3:["Baldur’s Gate 3","🧙","選択で物語が変わる本格RPG。育成・装備・探索・仲間との冒険をじっくり楽しめる.","https://store.steampowered.com/app/1086940/Baldurs_Gate_3/?l=japanese#app_reviews_hash",["rpg","story","buildchar","explore","long","strategy"]],
+dragon:["ドラゴンソード:アウェイクニング","🐲","キャラクターを育て、装備を整えながらファンタジーを進めるRPG.","https://store.steampowered.com/app/4570720/_/?l=japanese",["rpg","buildchar","action","long"]],
+ktt:["Keep Talking and Nobody Explodes","💣","1人が爆弾を操作し、仲間が説明。会話と連携がすべての協力ゲーム.","https://store.steampowered.com/app/341800/Keep_Talking_and_Nobody_Explodes/?l=japanese",["coop","puzzle","social","short"]],
+rv:["RV There Yet?","🚐","3人でRVを進めながらトラブルを乗り越える、協力＆ハチャメチャ系.","https://store.steampowered.com/app/3949040/RV_There_Yet/",["coop","fun","action","social","short"]],
+terraria:["Terraria","⛏️","探索・戦闘・建築・アイテム集めが全部入った2Dサンドボックスの定番.","https://store.steampowered.com/app/105600/Terraria/?l=japanese",["survival","build","action","explore","long","2d"]],
+sephiria:["セフィリア","🌸","2Dで冒険や探索を楽しみたいときの候補.","https://store.steampowered.com/app/2436940/_/?l=japanese",["2d","rpg","explore"]],
+core:["Core Keeper","💎","地下世界を掘り進み、探索・採掘・建築・戦闘・育成を楽しむ2Dサバイバル.","https://store.steampowered.com/app/1621690/Core_Keeper/",["survival","build","action","explore","long","2d"]],
+tarkov:["Escape from Tarkov","🔫","装備を持って出撃し、生還を目指す高緊張感FPS.","https://store.steampowered.com/app/3932890/Escape_from_Tarkov/?l=japanese",["fps","action","hard","competitive","long"]],
+ava:["AVA RE:BIRTH","🎯","チームで戦うオンラインFPS。気軽に銃撃戦を楽しみたいときに.","https://avarebirth.pmang.jp/ja",["fps","action","competitive","short"]]
+};
+const qs=[
+["FPSで銃を撃ち合いたい？",["fps"]],["勝ち負けがある緊張感が好き？",["competitive"]],["装備を失うような高リスクも楽しめる？",["hard"]],
+["Apexとは違うFPSを試したい？",["fps"]],["3人で協力して笑えるゲームがしたい？",["coop","fun"]],["友達とたくさん話しながら遊びたい？",["social","coop"]],
+["謎解きや連携が重要なゲームが好き？",["puzzle","social"]],["操作ミスやハプニングで笑えるゲームが好き？",["fun"]],
+["短時間でもサクッと遊びたい？",["short","casual"]],["広い世界を自由に探索したい？",["explore"]],["素材を集めてアイテムや装備を作りたい？",["survival"]],
+["拠点を建築・発展させたい？",["build"]],["キャラクターを育成して強くしたい？",["rpg","buildchar"]],
+["能力や装備を自分好みに考えたい？",["buildchar","rpg"]],["物語や仲間との冒険を重視したい？",["story","rpg"]],
+["何十時間も同じゲームをじっくり遊びたい？",["long"]],["難しくても試行錯誤して攻略するのが好き？",["hard","strategy"]],
+["2DゲームでもOK？",["2d"]],["建築・クラフト・探索・戦闘を全部楽しみたい？",["survival","build","action"]],
+["ゆっくり自分のペースで遊びたい？",["casual","explore"]]
+];
+let i=0,scores={};Object.keys(games).forEach(k=>scores[k]=0);
+function render(){document.getElementById("app").innerHTML=`<h1>🎮 3人用ゲーム診断</h1><div class="sub">質問を20個に増やしました。直感で「はい／いいえ」！</div><div class="progress"><div class="bar" style="width:${i/qs.length*100}%"></div></div><div class="qnum">質問 ${i+1} / ${qs.length}</div><div class="question">${qs[i][0]}</div><div class="buttons"><button class="btn yes" onclick="answer(1)">はい</button><button class="btn no" onclick="answer(0)">いいえ</button></div><div class="note">迷ったら直感でOK</div>`}
+function answer(yes){Object.entries(games).forEach(([k,g])=>{let hit=qs[i][1].some(t=>g[4].includes(t));scores[k]+=yes?(hit?2:0):(hit?0:1)});i++;if(i>=qs.length)result();else render()}
+function result(){let a=Object.entries(scores).sort((x,y)=>y[1]-x[1]),g=games[a[0][0]],pct=Math.min(99,Math.round(a[0][1]/(qs.length*2)*100));let alts=a.slice(1,4).map((x,n)=>`<div class="altItem">${n+2}位　${games[x[0]][1]} ${games[x[0]][0]}</div>`).join("");document.getElementById("app").innerHTML=`<div class="resultIcon">${g[1]}</div><div class="sub">診断結果</div><div class="resultTitle">${g[0]}</div><div class="match">あなたの回答との相性：${pct}%</div><div class="desc">${g[2]}</div><a class="link" href="${g[3]}" target="_blank">🎮 Steamページを見る</a><div class="alt"><div class="altTitle">次におすすめ</div>${alts}</div><button class="retry" onclick="location.reload()">🔄 もう一回診断</button><div class="note">回答からゲームの特徴を点数化した目安です。</div>`}
+render();
+</script>
+</body>
+</html>
