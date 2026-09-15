@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🎮 今日やるゲーム診断</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(135deg,#17172b,#24244a);color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.card{width:min(520px,100%);background:rgba(255,255,255,.09);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.15);border-radius:28px;padding:28px 22px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+h1{font-size:27px;margin:5px 0 10px}.sub{opacity:.75;font-size:14px;margin-bottom:28px}.q{font-size:23px;font-weight:700;line-height:1.5;min-height:105px;display:flex;align-items:center;justify-content:center}
+.buttons{display:grid;grid-template-columns:1fr 1fr;gap:12px}.btn{border:0;border-radius:18px;padding:17px;font-size:19px;font-weight:700;color:#fff;cursor:pointer}.yes{background:#2e8bff}.no{background:#555b72}.btn:active{transform:scale(.97)}
+.result-icon{font-size:58px}.result-title{font-size:25px;font-weight:800;margin:8px 0}.desc{opacity:.8;line-height:1.7;margin:12px 0 22px}.link,.retry{display:block;width:100%;padding:15px;border-radius:16px;text-decoration:none;font-weight:700;margin-top:10px}.link{background:#fff;color:#17172b}.retry{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.3)}
+.progress{height:5px;background:rgba(255,255,255,.12);border-radius:99px;margin-bottom:20px;overflow:hidden}.bar{height:100%;background:#fff;width:0%;transition:.25s}
+.small{font-size:12px;opacity:.55;margin-top:18px}
+</style>
+</head>
+<body>
+<div class="card" id="app"></div>
+<script>
+const games={
+peak:{name:"PEAK",icon:"🧗",desc:"3人でワイワイ登山！協力しながら進む、気軽に遊べるアクション。",url:"https://store.steampowered.com/app/3527290/PEAK/"},
+human:{name:"Human: Fall Flat",icon:"🤸",desc:"ふにゃふにゃキャラで協力。失敗しても笑えるパーティーゲーム。",url:"https://store.steampowered.com/app/477160/Human_Fall_Flat/?l=japanese"},
+bigwalk:{name:"Big Walk",icon:"🚶",desc:"友達と歩き回って遊ぶ、ゆるくて自由な探索系。",url:"https://store.steampowered.com/app/1478500/Big_Walk/"},
+enshrouded:{name:"Enshrouded ～霧の王国～",icon:"🏠",desc:"探索・戦闘・建築・育成をじっくり楽しむサバイバルRPG。",url:"https://store.steampowered.com/app/1203620/Enshrouded/"},
+valheim:{name:"Valheim",icon:"⚔️",desc:"仲間と世界を探索し、拠点を作り、強敵に挑むサバイバル。",url:"https://store.steampowered.com/app/892970/Valheim/?l=japanese"},
+dragonwilds:{name:"RuneScape: Dragonwilds",icon:"🐉",desc:"探索・クラフト・戦闘を楽しむファンタジー系サバイバル。",url:"https://store.steampowered.com/app/1374490/RuneScape_Dragonwilds/"},
+bg3:{name:"Baldur’s Gate 3",icon:"🧙",desc:"自由度の高い冒険と育成。仲間と物語を進める本格RPG。",url:"https://store.steampowered.com/app/1086940/Baldurs_Gate_3/?l=japanese"},
+dragon:{name:"ドラゴンソード:アウェイクニング",icon:"🐲",desc:"キャラクターを育てながら冒険・戦闘を楽しむRPG。",url:"https://store.steampowered.com/app/4570720/_/?l=japanese"},
+ktt:{name:"Keep Talking and Nobody Explodes",icon:"💣",desc:"1人が爆弾を操作、他の人が説明書を読んで解除。会話が勝負！",url:"https://store.steampowered.com/app/341800/Keep_Talking_and_Nobody_Explodes/?l=japanese"},
+rv:{name:"RV There Yet?",icon:"🚐",desc:"3人で協力してRVを運転！トラブルだらけの爆笑協力ゲーム。",url:"https://store.steampowered.com/app/3949040/RV_There_Yet/"},
+terraria:{name:"Terraria",icon:"⛏️",desc:"探索・戦闘・建築・アイテム集めを楽しめる2D定番。",url:"https://store.steampowered.com/app/105600/Terraria/?l=japanese"},
+sephiria:{name:"セフィリア",icon:"🌸",desc:"2Dで冒険を楽しみたいときの候補。",url:"https://store.steampowered.com/app/2436940/_/?l=japanese"},
+core:{name:"Core Keeper",icon:"💎",desc:"地下世界を探索して、採掘・建築・戦闘・育成を楽しむ2Dゲーム。",url:"https://store.steampowered.com/app/1621690/Core_Keeper/"},
+tarkov:{name:"Escape from Tarkov",icon:"🔫",desc:"緊張感のある本格FPS。装備を失うリスクも含めてスリル満点。",url:"https://store.steampowered.com/app/3932890/Escape_from_Tarkov/?l=japanese"},
+ava:{name:"AVA RE:BIRTH",icon:"🎯",desc:"気軽に遊びやすいオンラインFPS。Apexとは違う銃撃戦を楽しみたいときに。",url:"https://avarebirth.pmang.jp/ja"}
+};
+
+const questions=[
+ {q:"戦闘・対戦を楽しみたい？",y:"combat",n:"coop"},
+ {q:"FPS・銃撃戦がしたい？",y:"fps",n:"rpg"},
+ {q:"負けたら装備を失うような緊張感も楽しみたい？",y:"tarkov",n:"ava"},
+ {q:"キャラクターを育てたり、能力・装備を強くしたい？",y:"bg3",n:"dragon"},
+ {q:"自分たちで世界を作ったり、拠点を発展させたい？",y:"build",n:"party"},
+ {q:"2DのゲームでもOK？",y:"2d",n:"3d"},
+ {q:"探索・戦闘・建築をバランスよくやりたい？",y:"terraria",n:"core"},
+ {q:"とにかく3人でワイワイ笑いたい？",y:"partyfun",n:"explore"},
+ {q:"バカゲー・ハチャメチャ系でもOK？",y:"rv",n:"peak"},
+ {q:"乗り物に乗って協力するのがいい？",y:"rv",n:"human"},
+ {q:"謎解き・コミュニケーション系をやりたい？",y:"ktt",n:"explore2"},
+ {q:"ゆったり探索するゲームがいい？",y:"bigwalk",n:"valheim"}
+];
+
+let step=0, mode="";
+function render(){
+ const a=document.getElementById("app");
+ if(mode){showResult(mode);return}
+ let q=questions[step];
+ a.innerHTML=`<h1>🎮 今日やるゲーム診断</h1><div class="sub">3人で遊ぶゲームを決めよう！</div>
+ <div class="progress"><div class="bar" style="width:${Math.min(95,(step/questions.length)*100)}%"></div></div>
+ <div class="q">${q.q}</div><div class="buttons">
+ <button class="btn yes" onclick="answer('yes')">はい</button>
+ <button class="btn no" onclick="answer('no')">いいえ</button></div>
+ <div class="small">${step+1} / ${questions.length}</div>`;
+}
+function answer(v){
+ const key=questions[step][v==='yes'?'y':'n'];
+ if(["tarkov","ava","bg3","dragon","terraria","core","rv","human","ktt","bigwalk","valheim"].includes(key)){mode=key;render();return}
+ if(key==="combat"){step=1}
+ else if(key==="fps"){step=2}
+ else if(key==="rpg"){step=3}
+ else if(key==="build"){step=5}
+ else if(key==="2d"){step=6}
+ else if(key==="3d"){mode="enshrouded";render();return}
+ else if(key==="party"){step=7}
+ else if(key==="partyfun"){step=8}
+ else if(key==="explore"){step=10}
+ else if(key==="explore2"){step=11}
+ else if(key==="peak"){mode="peak";render();return}
+ else if(key==="coop"){step=4}
+ else if(key==="explore"){step=10}
+ else if(key==="3d"){mode="enshrouded";render();return}
+ else {step=Math.min(step+1,questions.length-1)}
+ render();
+}
+function showResult(id){
+ const g=games[id]||games.peak;
+ document.getElementById("app").innerHTML=`<div class="result-icon">${g.icon}</div>
+ <div class="sub">診断結果</div><div class="result-title">${g.name}</div>
+ <div class="desc">${g.desc}</div>
+ <a class="link" href="${g.url}" target="_blank" rel="noopener">🎮 Steamページを見る</a>
+ <button class="retry" onclick="step=0;mode='';render()">🔄 もう一回診断</button>`;
+}
+render();
+</script>
+</body>
+</html>
