@@ -1,0 +1,61 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>🎮 3人用ゲーム診断</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(145deg,#17172b,#29295a);color:#fff;padding:18px;display:flex;align-items:center;justify-content:center}.card{width:min(560px,100%);background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14);border-radius:28px;padding:25px 20px;box-shadow:0 18px 60px rgba(0,0,0,.3);text-align:center}h1{font-size:27px;margin:4px 0 8px}.sub{opacity:.7;font-size:14px;margin-bottom:22px}.progress{height:6px;background:rgba(255,255,255,.12);border-radius:99px;overflow:hidden;margin:0 0 25px}.bar{height:100%;background:#fff;transition:.3s}.qnum{font-size:13px;opacity:.6;margin-bottom:8px}.question{font-size:22px;font-weight:800;line-height:1.55;min-height:105px;display:flex;align-items:center;justify-content:center}.choices{display:grid;gap:11px}.choice{border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.1);color:#fff;border-radius:17px;padding:16px 14px;font-size:17px;font-weight:700;text-align:left;cursor:pointer}.choice:active{transform:scale(.98)}.resultIcon{font-size:64px}.resultTitle{font-size:27px;font-weight:900;margin:6px 0 15px}.desc{line-height:1.7;opacity:.86;margin:12px 0 20px}.link,.retry{display:block;width:100%;padding:15px;border-radius:16px;font-size:16px;font-weight:800;text-decoration:none;margin-top:10px}.link{background:#fff;color:#17172b}.retry{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.28)}.alt{margin-top:24px;text-align:left;background:rgba(0,0,0,.15);border-radius:18px;padding:15px}.altTitle{font-weight:800;margin-bottom:8px}.altItem{padding:8px 0;border-top:1px solid rgba(255,255,255,.1);font-size:14px}.note{font-size:12px;opacity:.45;margin-top:17px}
+</style></head><body><main class="card" id="app"></main><script>
+const games={
+peak:["PEAK","🧗","3人で協力して山を登る、短時間でも遊びやすいワイワイ系アクション.","https://store.steampowered.com/app/3527290/PEAK/",["party","action","fun","explore","short"]],
+human:["Human: Fall Flat","🤸","ふにゃふにゃキャラで物理パズル。失敗そのものが笑いになる協力ゲーム.","https://store.steampowered.com/app/477160/Human_Fall_Flat/?l=japanese",["party","puzzle","fun","casual","short"]],
+bigwalk:["Big Walk","🚶","友達と歩き回りながら遊ぶ、ゆるく自由なコミュニケーション重視のゲーム.","https://store.steampowered.com/app/1478500/Big_Walk/",["party","casual","explore","social","short"]],
+enshrouded:["Enshrouded ～霧の王国～","🏠","探索・戦闘・建築・クラフト・育成を長く楽しめるサバイバルRPG.","https://store.steampowered.com/app/1203620/Enshrouded/",["survival","build","rpg","action","explore","long","3d"]],
+valheim:["Valheim","🪓","冒険、資源集め、拠点作り、ボス戦をじっくり楽しむサバイバル.","https://store.steampowered.com/app/892970/Valheim/?l=japanese",["survival","build","action","explore","long","hard","3d"]],
+dragonwilds:["RuneScape: Dragonwilds","🐉","ファンタジー世界で探索・クラフト・戦闘を進めるサバイバル.","https://store.steampowered.com/app/1374490/RuneScape_Dragonwilds/",["survival","rpg","explore","action","long","3d"]],
+bg3:["Baldur’s Gate 3","🧙","選択で物語が変わる本格RPG。育成・装備・探索・仲間との冒険をじっくり楽しめる.","https://store.steampowered.com/app/1086940/Baldurs_Gate_3/?l=japanese#app_reviews_hash",["rpg","story","buildchar","explore","long","strategy","3d"]],
+dragon:["ドラゴンソード:アウェイクニング","🐲","キャラクターを育て、装備を整えながらファンタジーを進めるRPG.","https://store.steampowered.com/app/4570720/_/?l=japanese",["rpg","buildchar","action","long","3d"]],
+ktt:["Keep Talking and Nobody Explodes","💣","1人が爆弾を操作し、仲間が説明。会話と連携がすべての協力ゲーム.","https://store.steampowered.com/app/341800/Keep_Talking_and_Nobody_Explodes/?l=japanese",["party","puzzle","social","short"]],
+rv:["RV There Yet?","🚐","3人でRVを進めながらトラブルを乗り越える、協力＆ハチャメチャ系.","https://store.steampowered.com/app/3949040/RV_There_Yet/",["party","fun","action","social","short"]],
+terraria:["Terraria","⛏️","探索・戦闘・建築・アイテム集めが全部入った2Dサンドボックスの定番.","https://store.steampowered.com/app/105600/Terraria/?l=japanese",["survival","build","action","explore","long","2d"]],
+sephiria:["セフィリア","🌸","2Dで冒険や探索を楽しみたいときの候補.","https://store.steampowered.com/app/2436940/_/?l=japanese",["2d","rpg","explore"]],
+core:["Core Keeper","💎","地下世界を掘り進み、探索・採掘・建築・戦闘・育成を楽しむ2Dサバイバル.","https://store.steampowered.com/app/1621690/Core_Keeper/",["survival","build","action","explore","long","2d"]],
+tarkov:["Escape from Tarkov","🔫","装備を持って出撃し、生還を目指す高緊張感FPS.","https://store.steampowered.com/app/3932890/Escape_from_Tarkov/?l=japanese",["fps","action","hard","competitive","long","3d"]],
+ava:["AVA RE:BIRTH","🎯","チームで戦うオンラインFPS。気軽に銃撃戦を楽しみたいときに.","https://avarebirth.pmang.jp/ja",["fps","action","competitive","short","3d"]]
+};
+const qs=[
+["まず、今日はどんな遊び方をしたい？",[["battle","戦って勝ち負けを楽しみたい"],["adventure","冒険・探索を楽しみたい"],["party","3人でワイワイ遊びたい"]]],
+["ゲームの雰囲気は？",[["competitive","真剣に戦いたい"],["coop","協力して進みたい"],["story","物語やキャラを楽しみたい"]]],
+["戦うなら、どんな感じがいい？",[["fps","銃を使って戦いたい"],["action","近接戦闘やアクションがいい"],["strategy","考えながら戦いたい"]]],
+["遊ぶペースは？",[["short","短時間でも遊びやすいほうがいい"],["long","長くじっくり遊びたい"],["casual","その日の気分でゆっくり遊びたい"]]],
+["世界を探索するなら？",[["explore","知らない場所をどんどん探したい"],["build","拠点や自分たちの場所を作りたい"],["social","友達との会話ややり取りを楽しみたい"]]],
+["育成要素は？",[["rpg","キャラクターが強くなっていくのが好き"],["buildchar","能力や装備を考えるのが好き"],["none","育成はそこまで重視しない"]]],
+["難しさはどのくらいがいい？",[["hard","難しくても試行錯誤したい"],["normal","ほどよい難しさがいい"],["casual","気楽に遊びたい"]]],
+["3Dと2Dなら？",[["3d","3Dの世界で遊びたい"],["2d","2Dでも全然OK"],["both","どちらでもいい"]]],
+["3人で遊ぶなら？",[["fun","失敗やハプニングで笑いたい"],["puzzle","みんなで考えて解きたい"],["action","動かして遊ぶ爽快感がほしい"]]],
+["クラフトや建築は？",[["survival","素材を集めて作りたい"],["build","拠点を大きくしたい"],["none","なくても大丈夫"]]],
+["ストーリーは？",[["story","ストーリーもしっかり楽しみたい"],["explore","世界を自由に歩き回るほうが好き"],["none","ストーリーはあまり気にしない"]]],
+["友達との遊び方は？",[["social","話しながらワイワイしたい"],["coop","役割分担して協力したい"],["competitive","それぞれの腕前で勝負したい"]]],
+["長く遊ぶなら？",[["long","育成や進行を積み重ねたい"],["explore","毎回いろいろ探索したい"],["fun","何度やってもハプニングが起きてほしい"]]],
+["最後に、今の気分は？",[["intense","緊張感・達成感がほしい"],["relax","気楽に笑って遊びたい"],["adventure","冒険している感じがほしい"]]]
+];
+let i=0,scores={};Object.keys(games).forEach(k=>scores[k]=0);
+function answer(tag){
+Object.entries(games).forEach(([k,g])=>{
+ let tags=g[4];
+ if(tags.includes(tag))scores[k]+=3;
+ if(tag==="battle"&&tags.includes("action"))scores[k]+=1;
+ if(tag==="adventure"&&tags.includes("explore"))scores[k]+=2;
+ if(tag==="party"&&tags.includes("party"))scores[k]+=3;
+ if(tag==="coop"&&tags.includes("party"))scores[k]+=2;
+ if(tag==="story"&&tags.includes("rpg"))scores[k]+=2;
+});
+i++;i>=qs.length?result():render();
+}
+function render(){
+let q=qs[i];
+document.getElementById("app").innerHTML=`<h1>🎮 3人用ゲーム診断</h1><div class="sub">大きな好みから少しずつ絞っていきます。直感で答えてOK！</div><div class="progress"><div class="bar" style="width:${i/qs.length*100}%"></div></div><div class="qnum">質問 ${i+1} / ${qs.length}</div><div class="question">${q[0]}</div><div class="choices">${q[1].map(x=>`<button class="choice" onclick="answer('${x[0]}')">${x[1]}</button>`).join("")}</div><div class="note">迷ったら一番近いものを選んでね</div>`;
+}
+function result(){
+let a=Object.entries(scores).sort((x,y)=>y[1]-x[1]),g=games[a[0][0]];
+let alts=a.slice(1,4).map((x,n)=>`<div class="altItem">${n+2}位　${games[x[0]][1]} ${games[x[0]][0]}</div>`).join("");
+document.getElementById("app").innerHTML=`<div class="resultIcon">${g[1]}</div><div class="sub">診断結果</div><div class="resultTitle">${g[0]}</div><div class="desc">${g[2]}</div><a class="link" href="${g[3]}" target="_blank" rel="noopener">🎮 Steamページを見る</a><div class="alt"><div class="altTitle">他にもこんな候補</div>${alts}</div><button class="retry" onclick="location.reload()">🔄 もう一回やる</button><div class="note">回答から、その日の気分に合いそうな順に選んでいます。</div>`;
+}
+render();
+</script></body></html>
