@@ -1,0 +1,102 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>🎮 ゲーム診断</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(145deg,#17172b,#29295a);color:#fff;padding:18px;display:flex;align-items:center;justify-content:center}.card{width:min(560px,100%);background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14);border-radius:28px;padding:25px 20px;box-shadow:0 18px 60px rgba(0,0,0,.3);text-align:center}h1{font-size:27px;margin:4px 0 8px}.sub{opacity:.7;font-size:14px;margin-bottom:22px}.progress{height:6px;background:rgba(255,255,255,.12);border-radius:99px;overflow:hidden;margin:0 0 25px}.bar{height:100%;background:#fff;transition:.3s}.qnum{font-size:13px;opacity:.6;margin-bottom:8px}.question{font-size:22px;font-weight:800;line-height:1.55;min-height:105px;display:flex;align-items:center;justify-content:center}.choices{display:grid;gap:11px}.choice{border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.1);color:#fff;border-radius:17px;padding:16px 14px;font-size:17px;font-weight:700;text-align:left;cursor:pointer}.choice:active{transform:scale(.98)}.resultIcon{font-size:64px}.resultTitle{font-size:27px;font-weight:900;margin:6px 0 15px}.desc{line-height:1.7;opacity:.86;margin:12px 0 20px}.link,.retry{display:block;width:100%;padding:15px;border-radius:16px;font-size:16px;font-weight:800;text-decoration:none;margin-top:10px}.link{background:#fff;color:#17172b}.retry{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.28)}.alt{margin-top:24px;text-align:left;background:rgba(0,0,0,.15);border-radius:18px;padding:15px}.altTitle{font-weight:800;margin-bottom:8px}.altItem{padding:8px 0;border-top:1px solid rgba(255,255,255,.1);font-size:14px}.note{font-size:12px;opacity:.45;margin-top:17px}
+</style></head><body><main class="card" id="app"></main><script>
+const games={
+aion2:["AION 2","🪽","自由飛行で広大な世界を探索し、クラス育成・空中戦・5人/10人コンテンツなどを楽しめるMMORPG。","https://store.steampowered.com/app/3393110/AION_2/",["rpg","action","explore","long","3d","coop","story","buildchar","competitive"]],
+
+peak:["PEAK","🧗","3人で協力して山を登る、短時間でも遊びやすいワイワイ系アクション.","https://store.steampowered.com/app/3527290/PEAK/",["party","action","fun","explore","short"]],
+human:["Human: Fall Flat","🤸","ふにゃふにゃキャラで物理パズル。失敗そのものが笑いになる協力ゲーム.","https://store.steampowered.com/app/477160/Human_Fall_Flat/?l=japanese",["party","puzzle","fun","casual","short"]],
+bigwalk:["Big Walk","🚶","友達と歩き回りながら遊ぶ、ゆるく自由なコミュニケーション重視のゲーム.","https://store.steampowered.com/app/1478500/Big_Walk/",["party","casual","explore","social","short"]],
+enshrouded:["Enshrouded ～霧の王国～","🏠","探索・戦闘・建築・クラフト・育成を長く楽しめるサバイバルRPG.","https://store.steampowered.com/app/1203620/Enshrouded/",["survival","build","rpg","action","explore","long","3d"]],
+valheim:["Valheim","🪓","冒険、資源集め、拠点作り、ボス戦をじっくり楽しむサバイバル.","https://store.steampowered.com/app/892970/Valheim/?l=japanese",["survival","build","action","explore","long","hard","3d"]],
+dragonwilds:["RuneScape: Dragonwilds","🐉","ファンタジー世界で探索・クラフト・戦闘を進めるサバイバル.","https://store.steampowered.com/app/1374490/RuneScape_Dragonwilds/",["survival","rpg","explore","action","long","3d"]],
+bg3:["Baldur’s Gate 3","🧙","選択で物語が変わる本格RPG。育成・装備・探索・仲間との冒険をじっくり楽しめる.","https://store.steampowered.com/app/1086940/Baldurs_Gate_3/?l=japanese#app_reviews_hash",["rpg","story","buildchar","explore","long","strategy","3d"]],
+dragon:["ドラゴンソード:アウェイクニング","🐲","キャラクターを育て、装備を整えながらファンタジーを進めるRPG.","https://store.steampowered.com/app/4570720/_/?l=japanese",["rpg","buildchar","action","long","3d"]],
+ktt:["Keep Talking and Nobody Explodes","💣","1人が爆弾を操作し、仲間が説明。会話と連携がすべての協力ゲーム.","https://store.steampowered.com/app/341800/Keep_Talking_and_Nobody_Explodes/?l=japanese",["party","puzzle","social","short"]],
+rv:["RV There Yet?","🚐","3人でRVを進めながらトラブルを乗り越える、協力＆ハチャメチャ系.","https://store.steampowered.com/app/3949040/RV_There_Yet/",["party","fun","action","social","short"]],
+terraria:["Terraria","⛏️","探索・戦闘・建築・アイテム集めが全部入った2Dサンドボックスの定番.","https://store.steampowered.com/app/105600/Terraria/?l=japanese",["survival","build","action","explore","long","2d"]],
+sephiria:["セフィリア","🌸","2Dで冒険や探索を楽しみたいときの候補.","https://store.steampowered.com/app/2436940/_/?l=japanese",["2d","rpg","explore"]],
+core:["Core Keeper","💎","地下世界を掘り進み、探索・採掘・建築・戦闘・育成を楽しむ2Dサバイバル.","https://store.steampowered.com/app/1621690/Core_Keeper/",["survival","build","action","explore","long","2d"]],
+tarkov:["Escape from Tarkov","🔫","装備を持って出撃し、生還を目指す高緊張感FPS.","https://store.steampowered.com/app/3932890/Escape_from_Tarkov/?l=japanese",["fps","action","hard","competitive","long","3d"]],
+ava:["AVA RE:BIRTH","🎯","チームで戦うオンラインFPS。気軽に銃撃戦を楽しみたいときに.","https://avarebirth.pmang.jp/ja",["fps","action","competitive","short","3d"]]
+};
+const qs=[[["今日はどんな遊び方をしたい？",[["battle","ドキドキしながら戦いたい"],["adventure","知らない場所を探検したい"],["party","友達と笑いながら遊びたい"],["skip","どれもあてはまらない"]]],["ゲームを始めたら、まず何をしたい？",[["action","すぐ動いて遊びたい"],["explore","周りを見て歩き回りたい"],["build","道具や自分の場所を作りたい"],["skip","どれもあてはまらない"]]],["友達と遊ぶなら、どんな時間が楽しそう？",[["coop","一緒に考えて協力したい"],["fun","失敗しながら笑いたい"],["competitive","お互いに勝負したい"],["skip","どれもあてはまらない"]]],["戦うゲームなら、どんな感じが好きそう？",[["fps","銃を使って遠くから戦いたい"],["action","自分で動いて近くで戦いたい"],["strategy","どうするか考えてから戦いたい"],["skip","どれもあてはまらない"]]],["戦うとき、どっちのほうが楽しそう？",[["intense","一瞬の判断で勝負したい"],["hard","何度も挑戦して上手くなりたい"],["casual","失敗しても気楽に遊びたい"],["skip","どれもあてはまらない"]]],["知らない場所を見つけるのは好き？",[["explore","行ったことのない場所を見つけたい"],["adventure","危ない場所にも入ってみたい"],["story","探しているうちに物語が進むのがいい"],["skip","どれもあてはまらない"]]],["ゲームの中で移動するなら？",[["explore","歩き回って自分で見つけたい"],["action","動きながらいろいろなことをしたい"],["rpg","大きな世界を少しずつ進みたい"],["skip","どれもあてはまらない"]]],["家や自分たちの場所を作るなら？",[["build","好きなように作りたい"],["survival","材料を集めながら作りたい"],["none","作るより冒険したい"],["skip","どれもあてはまらない"]]],["材料を集めるのは？",[["survival","集めて道具を作るのが楽しそう"],["build","集めたものを使って大きくしたい"],["explore","集めるより珍しいものを探したい"],["skip","どれもあてはまらない"]]],["少しずつ強くなっていくのは？",[["rpg","キャラクターが強くなるのが楽しそう"],["buildchar","自分好みに強さを決めたい"],["none","強くすることはあまり気にしない"],["skip","どれもあてはまらない"]]],["自分のキャラクターを変えられるなら？",[["buildchar","見た目や強さを自分好みにしたい"],["rpg","強くなる方法を考えたい"],["none","そこはあまり気にしない"],["skip","どれもあてはまらない"]]],["ゲームの中で知らない人たちがたくさんいる世界は？",[["rpg","大きな世界をみんなと一緒に冒険したい"],["social","他の人と出会ったり話したりしたい"],["none","友達だけで遊べればいい"],["skip","どれもあてはまらない"]]],["他の人と一緒に遊ぶなら？",[["social","知らない人とも交流してみたい"],["coop","友達だけで協力したい"],["competitive","他の人と勝負したい"],["skip","どれもあてはまらない"]]],["ゲームの難しさは？",[["hard","難しくても何度も挑戦したい"],["normal","少し難しいくらいがいい"],["casual","できるだけ気楽に遊びたい"],["skip","どれもあてはまらない"]]],["遊ぶ時間は？",[["short","短い時間でも楽しめるほうがいい"],["long","何時間でもじっくり遊びたい"],["casual","その日の気分で変えたい"],["skip","どれもあてはまらない"]]],["物語はどれくらい大事？",[["story","続きが気になる物語を楽しみたい"],["explore","物語より自由に探検したい"],["none","物語はあまり気にしない"],["skip","どれもあてはまらない"]]],["ゲームの中で選択肢があったら？",[["story","選んだことで話が変わるとうれしい"],["strategy","どうするか考えて選びたい"],["casual","あまり難しく考えず選びたい"],["skip","どれもあてはまらない"]]],["3人で遊ぶなら、どんな場面が楽しそう？",[["fun","思わぬ失敗やハプニングで笑いたい"],["puzzle","3人で相談して答えを見つけたい"],["action","3人で動き回って遊びたい"],["skip","どれもあてはまらない"]]],["友達との役割は？",[["coop","それぞれ違うことをして助け合いたい"],["action","みんな同じように動きたい"],["competitive","自分の上手さを試したい"],["skip","どれもあてはまらない"]]],["見た目はどちらが好み？",[["3d","立体的な世界で遊びたい"],["2d","絵のような世界で遊びたい"],["both","どちらでも気にしない"],["skip","どれもあてはまらない"]]],["危ない場所に入って、無事に帰る遊び方は？",[["hard","緊張感があって楽しそう"],["explore","知らない場所を探すのが楽しそう"],["casual","もっと気楽なほうがいい"],["skip","どれもあてはまらない"]]],["乗り物に乗って友達と進むなら？",[["party","途中で何が起こるかわからないのが楽しそう"],["fun","失敗やハプニングで笑いたい"],["none","乗り物にはあまり興味がない"],["skip","どれもあてはまらない"]]],["最後に、今一番近い気分は？",[["intense","手に汗握る勝負をしたい"],["relax","友達と気楽に遊びたい"],["adventure","みんなで大冒険したい"],["skip","どれもあてはまらない"]]]]];
+const altQs=[["もし友達と一緒に遊ぶなら？",[["coop","一緒に何かを完成させたい"],["fun","予想外のことが起きて笑いたい"],["adventure","一緒に知らない場所へ行きたい"],["skip","どれもあてはまらない"]]],["ゲームを始めて、最初に見たいものは？",[["explore","きれいな景色や面白い場所"],["action","すぐ遊べる楽しい動き"],["story","この先どうなるのか気になる話"],["skip","どれもあてはまらない"]]],["友達と協力するとしたら？",[["puzzle","みんなで考えて答えを出したい"],["coop","それぞれ違うことをして助け合いたい"],["fun","失敗しても笑いながら進みたい"],["skip","どれもあてはまらない"]]],["銃を使うなら、どんな遊び方がよさそう？",[["fps","遠くから狙って戦いたい"],["competitive","相手との勝負に集中したい"],["action","走りながら動き回って戦いたい"],["skip","どれもあてはまらない"]]],["うまくいかなかったときは？",[["hard","できるまで何度もやってみたい"],["normal","少し考えればできるくらいがいい"],["casual","失敗しても笑って次へ進みたい"],["skip","どれもあてはまらない"]]],["冒険するなら、どちらが楽しそう？",[["explore","地図にない場所を見つけたい"],["adventure","危険な場所にも挑戦したい"],["story","探しながら話を進めたい"],["skip","どれもあてはまらない"]]],["広い世界で遊ぶなら？",[["explore","自分の好きな方向へ行きたい"],["rpg","少しずつできることを増やしたい"],["action","走ったり戦ったりしながら進みたい"],["skip","どれもあてはまらない"]]],["自分の場所を作るなら？",[["build","好きな見た目にしたい"],["survival","必要なものを集めて作りたい"],["coop","友達と一緒に作りたい"],["skip","どれもあてはまらない"]]],["集めるなら、何をしたい？",[["survival","集めたものから道具を作りたい"],["explore","珍しいものを探しに行きたい"],["build","集めた材料で大きなものを作りたい"],["skip","どれもあてはまらない"]]],["キャラクターが強くなるなら？",[["rpg","少しずつ強くなっていくのが好き"],["buildchar","自分で強くなり方を選びたい"],["long","長く遊んで成長を感じたい"],["skip","どれもあてはまらない"]]],["キャラクターを自分好みにできるなら？",[["buildchar","見た目を好きなようにしたい"],["rpg","強くする方法を自分で決めたい"],["social","友達と違うキャラクターにしたい"],["skip","どれもあてはまらない"]]],["大きな世界にたくさんの人がいるなら？",[["rpg","みんながいる世界を冒険したい"],["social","他の人と出会ってみたい"],["explore","人よりも世界そのものを見て回りたい"],["skip","どれもあてはまらない"]]],["知らない人と遊ぶなら？",[["social","話したり一緒に遊んだりしたい"],["competitive","相手と勝負したい"],["coop","協力して一つのことをしたい"],["skip","どれもあてはまらない"]]],["ちょっと難しいゲームなら？",[["hard","できるようになるまで挑戦したい"],["normal","頑張ればできるくらいがいい"],["casual","簡単に楽しめるほうがいい"],["skip","どれもあてはまらない"]]],["ゲームを遊ぶ時間は？",[["short","少し遊んですぐ終われるほうがいい"],["long","休日に何時間も遊びたい"],["casual","その日の気分で決めたい"],["skip","どれもあてはまらない"]]],["ゲームに物語があるなら？",[["story","先の展開が気になる話がいい"],["explore","話より自由に動き回りたい"],["rpg","冒険しながら話が進むのがいい"],["skip","どれもあてはまらない"]]],["自分で決める場面が多いゲームは？",[["strategy","考えてから決めたい"],["story","自分の選択で話が変わってほしい"],["casual","あまり難しいことは考えたくない"],["skip","どれもあてはまらない"]]],["3人で遊ぶなら？",[["fun","変なことが起きて笑えるゲーム"],["puzzle","3人で相談して進むゲーム"],["action","3人で一緒に動き回るゲーム"],["skip","どれもあてはまらない"]]],["友達と遊ぶとき、どれが近い？",[["coop","お互いに助け合いたい"],["fun","くだらないことで笑いたい"],["competitive","誰が上手いか勝負したい"],["skip","どれもあてはまらない"]]],["ゲームの見た目なら？",[["3d","本当にその場所にいるような世界"],["2d","かわいい・絵のような世界"],["both","どちらも楽しめそう"],["skip","どれもあてはまらない"]]],["危ない場所を探検するなら？",[["explore","何があるのか見てみたい"],["hard","危険を乗り越えたい"],["adventure","無事に帰れるか挑戦したい"],["skip","どれもあてはまらない"]]],["友達と乗り物に乗るなら？",[["party","何が起きるかわからない旅がしたい"],["fun","途中のハプニングを楽しみたい"],["coop","みんなで協力して進みたい"],["skip","どれもあてはまらない"]]],["今の気分に近いのは？",[["battle","敵と戦ってスッキリしたい"],["adventure","知らない場所へ行ってみたい"],["party","友達と笑って遊びたい"],["skip","どれもあてはまらない"]]]];
+let i=0,scores={},skips=0,usingAlt=false;
+
+const fallbackQs=[
+["今の気分に一番近いのは？",[["battle","敵と戦って勝つことを楽しみたい"],["adventure","広い世界を自由に見て回りたい"],["coop","友達と一緒に何かを成し遂げたい"],["build","自分たちの場所や道具を作りたい"],["skip","まだ決められない"]]],
+["ゲームを選ぶとき、近いのは？",[["fps","銃を使うゲームが気になる"],["rpg","キャラクターを育てるゲームが気になる"],["survival","材料を集めて生き残るゲームが気になる"],["party","友達とワイワイできるゲームが気になる"],["skip","まだ決められない"]]]
+];
+let fallbackIndex=0,usingFallback=false;
+Object.keys(games).forEach(k=>scores[k]=0);
+
+function answer(tag){
+  // 「どれもあてはまらない」なら、質問番号は進めず別の質問に変更。
+  if(tag==="skip"){
+    if(!usingAlt){
+      usingAlt=true;
+      render();
+      return;
+    }
+    // 別の質問でも答えにくければ、その質問は飛ばして次へ。
+    usingAlt=false;
+    i++;
+    if(i>=qs.length){ result(); } else { render(); }
+    return;
+  }
+
+  Object.entries(games).forEach(([k,g])=>{
+    let tags=g[4];
+    if(tags.includes(tag))scores[k]+=3;
+    if(tag==="battle"&&tags.includes("action"))scores[k]+=1;
+    if(tag==="adventure"&&tags.includes("explore"))scores[k]+=2;
+    if(tag==="party"&&tags.includes("party"))scores[k]+=3;
+    if(tag==="coop"&&tags.includes("party"))scores[k]+=2;
+    if(tag==="story"&&tags.includes("rpg"))scores[k]+=2;
+  });
+
+  usingAlt=false;
+  i++;
+  if(i>=qs.length){ result(); } else { render(); }
+}
+
+function render(){
+  let q=usingAlt ? altQs[i] : qs[i];
+  document.getElementById("app").innerHTML=`
+    <h1>🎮 ゲーム診断</h1>
+    <div class="sub">ゲーム初心者でも選びやすいように、簡単な質問から少しずつ絞ります。直感でOK！</div>
+    <div class="progress"><div class="bar" style="width:${i/qs.length*100}%"></div></div>
+    <div class="qnum">質問 ${i+1} / ${qs.length}</div>
+    <div class="question">${q[0]}</div>
+    <div class="choices">${q[1].map(x=>`<button class="choice" onclick="answer('${x[0]}')">${x[1]}</button>`).join("")}</div>
+    <div class="note">${usingAlt ? "別の質問に変えました。わからなければ、もう一度「どれもあてはまらない」でもOK！" : "わからなければ、なんとなくでOK！「どれもあてはまらない」を選んでも大丈夫。"}</div>`;
+}
+
+function result(){
+  let a=Object.entries(scores).sort((x,y)=>y[1]-x[1]),g=games[a[0][0]];
+  let alts=a.slice(1,4).map((x,n)=>`<div class="altItem">${n+2}位　${games[x[0]][1]} ${games[x[0]][0]}</div>`).join("");
+  document.getElementById("app").innerHTML=`
+    <div class="resultIcon">${g[1]}</div>
+    <div class="sub">診断結果</div>
+    <div class="resultTitle">${g[0]}</div>
+    <div class="desc">${g[2]}</div>
+    <a class="link" href="${g[3]}" target="_blank" rel="noopener">🎮 Steamページを見る</a>
+    <div class="alt"><div class="altTitle">他にもこんな候補</div>${alts}</div>
+    <button class="retry" onclick="location.reload()">🔄 もう一回やる</button>
+    <div class="note">難しい言葉は使わず、答えから今の気分に合いそうなゲームを選んでいます。</div>`;
+}
+render();
+}
+function render(){
+let q=qs[i];
+document.getElementById("app").innerHTML=`<h1>🎮 ゲーム診断</h1><div class="sub">ゲーム初心者でも選びやすいように、簡単な質問から少しずつ絞ります。直感でOK！</div><div class="progress"><div class="bar" style="width:${i/qs.length*100}%"></div></div><div class="qnum">質問 ${i+1} / ${qs.length}</div><div class="question">${q[0]}</div><div class="choices">${q[1].map(x=>`<button class="choice" onclick="answer('${x[0]}')">${x[1]}</button>`).join("")}</div><div class="note">わからなければ、なんとなくでOK！「どれもあてはまらない」を選んでも大丈夫。</div>`;
+}
+function result(){
+let a=Object.entries(scores).sort((x,y)=>y[1]-x[1]),g=games[a[0][0]];
+let alts=a.slice(1,4).map((x,n)=>`<div class="altItem">${n+2}位　${games[x[0]][1]} ${games[x[0]][0]}</div>`).join("");
+document.getElementById("app").innerHTML=`<div class="resultIcon">${g[1]}</div><div class="sub">診断結果</div><div class="resultTitle">${g[0]}</div><div class="desc">${g[2]}</div><a class="link" href="${g[3]}" target="_blank" rel="noopener">🎮 Steamページを見る</a><div class="alt"><div class="altTitle">他にもこんな候補</div>${alts}</div><button class="retry" onclick="location.reload()">🔄 もう一回やる</button><div class="note">難しい言葉は使わず、答えから今の気分に合いそうなゲームを選んでいます。</div>`;
+}
+render();
+</script></body></html>
