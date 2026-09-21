@@ -1,0 +1,143 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>🎮 ゲーム診断</title><style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(145deg,#17172b,#29295a);color:#fff;padding:18px;display:flex;align-items:center;justify-content:center}.card{width:min(560px,100%);background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14);border-radius:28px;padding:25px 20px;box-shadow:0 18px 60px rgba(0,0,0,.3);text-align:center}h1{font-size:27px;margin:4px 0 8px}.sub{opacity:.7;font-size:14px;margin-bottom:22px}.progress{height:6px;background:rgba(255,255,255,.12);border-radius:99px;overflow:hidden;margin:0 0 25px}.bar{height:100%;background:#fff;transition:.3s}.qnum{font-size:13px;opacity:.6;margin-bottom:8px}.question{font-size:22px;font-weight:800;line-height:1.55;min-height:105px;display:flex;align-items:center;justify-content:center}.choices{display:grid;gap:11px}.choice{border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.1);color:#fff;border-radius:17px;padding:16px 14px;font-size:17px;font-weight:700;text-align:left;cursor:pointer}.choice:active{transform:scale(.98)}.resultIcon{font-size:64px}.resultTitle{font-size:27px;font-weight:900;margin:6px 0 15px}.desc{line-height:1.7;opacity:.86;margin:12px 0 20px}.link,.retry{display:block;width:100%;padding:15px;border-radius:16px;font-size:16px;font-weight:800;text-decoration:none;margin-top:10px}.link{background:#fff;color:#17172b}.retry{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.28)}.alt{margin-top:24px;text-align:left;background:rgba(0,0,0,.15);border-radius:18px;padding:15px}.altTitle{font-weight:800;margin-bottom:8px}.altItem{padding:8px 0;border-top:1px solid rgba(255,255,255,.1);font-size:14px}.note{font-size:12px;opacity:.45;margin-top:17px}
+.back{display:block;width:100%;padding:14px;border-radius:16px;font-size:16px;font-weight:800;background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.25);margin-top:10px;cursor:pointer}.back:active,.altChoice:active{transform:scale(.98)}.alt{margin-top:24px;text-align:left;background:rgba(0,0,0,.15);border-radius:18px;padding:15px}.altTitle{font-weight:800;margin-bottom:8px}.altChoice{display:block;width:100%;padding:11px 10px;margin-top:7px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(255,255,255,.06);color:#fff;text-align:left;font-weight:700;cursor:pointer}.mini{font-size:12px;opacity:.6;margin-top:5px}</style></head><body><main class="card" id="app"></main><script>const games={
+aion2:["AION 2","🪽","自由飛行で広大な世界を探索し、クラス育成・空中戦・5人/10人コンテンツなどを楽しめるMMORPG。","https://store.steampowered.com/app/3393110/AION_2/",["rpg","action","explore","long","3d","coop","story","buildchar","competitive"]],
+
+peak:["PEAK","🧗","3人で協力して山を登る、短時間でも遊びやすいワイワイ系アクション.","https://store.steampowered.com/app/3527290/PEAK/",["party","action","fun","explore","short"]],
+human:["Human: Fall Flat","🤸","ふにゃふにゃキャラで物理パズル。失敗そのものが笑いになる協力ゲーム.","https://store.steampowered.com/app/477160/Human_Fall_Flat/?l=japanese",["party","puzzle","fun","casual","short"]],
+bigwalk:["Big Walk","🚶","友達と歩き回りながら遊ぶ、ゆるく自由なコミュニケーション重視のゲーム.","https://store.steampowered.com/app/1478500/Big_Walk/",["party","casual","explore","social","short"]],
+enshrouded:["Enshrouded ～霧の王国～","🏠","探索・戦闘・建築・クラフト・育成を長く楽しめるサバイバルRPG.","https://store.steampowered.com/app/1203620/Enshrouded/",["survival","build","rpg","action","explore","long","3d"]],
+valheim:["Valheim","🪓","冒険、資源集め、拠点作り、ボス戦をじっくり楽しむサバイバル.","https://store.steampowered.com/app/892970/Valheim/?l=japanese",["survival","build","action","explore","long","hard","3d"]],
+dragonwilds:["RuneScape: Dragonwilds","🐉","ファンタジー世界で探索・クラフト・戦闘を進めるサバイバル.","https://store.steampowered.com/app/1374490/RuneScape_Dragonwilds/",["survival","rpg","explore","action","long","3d"]],
+bg3:["Baldur’s Gate 3","🧙","選択で物語が変わる本格RPG。育成・装備・探索・仲間との冒険をじっくり楽しめる.","https://store.steampowered.com/app/1086940/Baldurs_Gate_3/?l=japanese#app_reviews_hash",["rpg","story","buildchar","explore","long","strategy","3d"]],
+dragon:["ドラゴンソード:アウェイクニング","🐲","キャラクターを育て、装備を整えながらファンタジーを進めるRPG.","https://store.steampowered.com/app/4570720/_/?l=japanese",["rpg","buildchar","action","long","3d"]],
+ktt:["Keep Talking and Nobody Explodes","💣","1人が爆弾を操作し、仲間が説明。会話と連携がすべての協力ゲーム.","https://store.steampowered.com/app/341800/Keep_Talking_and_Nobody_Explodes/?l=japanese",["party","puzzle","social","short"]],
+rv:["RV There Yet?","🚐","3人でRVを進めながらトラブルを乗り越える、協力＆ハチャメチャ系.","https://store.steampowered.com/app/3949040/RV_There_Yet/",["party","fun","action","social","short"]],
+terraria:["Terraria","⛏️","探索・戦闘・建築・アイテム集めが全部入った2Dサンドボックスの定番.","https://store.steampowered.com/app/105600/Terraria/?l=japanese",["survival","build","action","explore","long","2d"]],
+sephiria:["セフィリア","🌸","2Dで冒険や探索を楽しみたいときの候補.","https://store.steampowered.com/app/2436940/_/?l=japanese",["2d","rpg","explore"]],
+core:["Core Keeper","💎","地下世界を掘り進み、探索・採掘・建築・戦闘・育成を楽しむ2Dサバイバル.","https://store.steampowered.com/app/1621690/Core_Keeper/",["survival","build","action","explore","long","2d"]],
+tarkov:["Escape from Tarkov","🔫","装備を持って出撃し、生還を目指す高緊張感FPS.","https://store.steampowered.com/app/3932890/Escape_from_Tarkov/?l=japanese",["fps","action","hard","competitive","long","3d"]],
+ava:["AVA RE:BIRTH","🎯","チームで戦うオンラインFPS。気軽に銃撃戦を楽しみたいときに.","https://avarebirth.pmang.jp/ja",["fps","action","competitive","short","3d"]]
+};
+const tree={
+  root:{q:'今日はどんなゲームがしたい？', choices:[
+    ['🔫 戦いたい','fight'],['🤝 協力してクリアしたい','coop'],['🌍 広い世界を冒険したい','explore'],['🏠 作ったり、集めたり、育てたい','build'],['😂 笑える・ワチャワチャしたゲームがしたい','fun']
+  ]},
+  fight:{q:'どんな戦いがしたい？', choices:[
+    ['🔫 銃で戦いたい','guns'],['⚔️ 剣や魔法で戦いたい','fantasyFight'],['🧙 キャラクターを育てながら戦いたい','rpgFight'],['🏆 対戦して勝ちたい','guns']
+  ]},
+  guns:{q:'銃撃戦ならどっちが近い？', choices:[
+    ['🏆 撃ち合いそのものを楽しみたい','result:ava'],['🎒 装備を集めて、生きて帰りたい','result:tarkov']
+  ]},
+  fantasyFight:{q:'戦闘以外では何を重視したい？', choices:[
+    ['🪽 大きなオンライン世界で遊びたい','result:aion2'],['🏠 建築や拠点づくりもしたい','buildFantasy'],['🧙 キャラクターや装備を育てたい','rpgFantasy'],['🌲 自然の中を自由に冒険したい','survivalFantasy']
+  ]},
+  buildFantasy:{q:'建築・冒険ならどれが近い？', choices:[
+    ['🏰 建築や拠点づくりを特に重視したい','result:enshrouded'],['🌲 サバイバルと自然探索を重視したい','result:valheim'],['🐉 ドラゴンなどのファンタジー要素を重視したい','result:dragonwilds']
+  ]},
+  survivalFantasy:{q:'自然の中で何を重視したい？', choices:[
+    ['🏠 拠点づくりやクラフト','result:enshrouded'],['🪓 サバイバル・探索・ボス戦','result:valheim'],['🐉 ドラゴンやファンタジー','result:dragonwilds']
+  ]},
+  rpgFantasy:{q:'育成や冒険で一番近いのは？', choices:[
+    ['🌎 大きなオンライン世界で長く育てたい','result:aion2'],['⚔️ 王道ファンタジーRPGとして育てたい','result:dragon'],['📖 2Dの物語と冒険を楽しみたい','result:sephiria'],['🏰 自由な探索と建築も重視したい','result:enshrouded']
+  ]},
+  rpgFight:{q:'どんな育成がしたい？', choices:[
+    ['🌎 オンライン世界で長くキャラクターを育てたい','result:aion2'],['🎭 仲間や選択で物語を変えたい','result:bg3'],['⚔️ 王道RPGとしてキャラクターを強くしたい','result:dragon'],['📖 2Dの物語と育成を楽しみたい','result:sephiria']
+  ]},
+  coop:{q:'どんな協力がしたい？', choices:[
+    ['🧗 難しい場所を進みたい','result:peak'],['💣 考えて謎を解きたい','result:ktt'],['🤸 操作ミスやハプニングを楽しみたい','result:human'],['🚗 乗り物で進みたい','result:rv'],['🚶 のんびり遊びながら話したい','result:bigwalk'],['⚔️ 冒険・戦闘・建築を一緒にやりたい','coopAdventure']
+  ]},
+  coopAdventure:{q:'どんな冒険がしたい？', choices:[
+    ['🏰 建築・クラフトを重視したい','result:enshrouded'],['🌲 自然の中でサバイバルしたい','result:valheim'],['🐉 ドラゴンなどのファンタジーを楽しみたい','result:dragonwilds'],['🪽 大きなオンライン世界を冒険したい','result:aion2']
+  ]},
+  explore:{q:'どんな世界を冒険したい？', choices:[
+    ['🪽 大きなオンライン世界を冒険したい','result:aion2'],['🌲 自然の中を冒険したい','nature'],['⛏️ 地下を掘りながら冒険したい','result:core'],['🏰 2Dの世界を自由に冒険したい','twoD'],['📖 物語を楽しみながら冒険したい','story']
+  ]},
+  nature:{q:'自然の中では何を重視したい？', choices:[
+    ['🏰 建築・拠点づくり','result:enshrouded'],['🪓 サバイバル・探索・ボス戦','result:valheim'],['🐉 ドラゴンやファンタジー','result:dragonwilds']
+  ]},
+  twoD:{q:'2Dならどちらが近い？', choices:[
+    ['🏗️ 自由に建築・探索したい','result:terraria'],['📖 物語を楽しみながら冒険したい','result:sephiria']
+  ]},
+  story:{q:'どんな物語がいい？', choices:[
+    ['🎭 自分の選択で物語を変えたい','result:bg3'],['⚔️ 王道ファンタジーRPGを進めたい','result:dragon'],['📖 2Dの物語を楽しみたい','result:sephiria']
+  ]},
+  build:{q:'何をするのが一番楽しそう？', choices:[
+    ['🏠 建築・拠点づくり','building'],['⛏️ 採掘・素材集め','gather'],['🧙 キャラクターを育てたい','character'],['⚔️ 装備を集めて強くなりたい','gear']
+  ]},
+  building:{q:'どんな建築がしたい？', choices:[
+    ['🏰 大きな建物や街を作りたい','result:enshrouded'],['🌲 自然の中に拠点を作りたい','result:valheim'],['⛏️ 地下に拠点を作りたい','result:core'],['🏗️ 2Dで自由に建築したい','result:terraria']
+  ]},
+  gather:{q:'何を集めたい？', choices:[
+    ['💎 地下の鉱石や宝','result:core'],['🏗️ 素材を集めて自由に作りたい','result:terraria'],['🌲 木・石などを集めて生き延びたい','result:valheim'],['🐉 ファンタジー世界で素材を集めたい','result:dragonwilds']
+  ]},
+  character:{q:'どんな育成がしたい？', choices:[
+    ['🌎 オンライン世界で長く育てたい','result:aion2'],['🎭 選択や仲間で育て方を変えたい','result:bg3'],['⚔️ 王道RPGとして強くしたい','result:dragon'],['📖 2Dの物語と育成を楽しみたい','result:sephiria']
+  ]},
+  gear:{q:'装備集めで一番近いのは？', choices:[
+    ['🧙 キャラクターを育てながら装備を強くしたい','result:aion2'],['🎒 装備を失う緊張感も楽しみたい','result:tarkov'],['🐉 冒険しながら装備を集めたい','result:dragonwilds'],['🏠 建築や探索もしながら装備を作りたい','result:enshrouded']
+  ]},
+  fun:{q:'どんな感じがいい？', choices:[
+    ['🧗 失敗しながら進みたい','result:peak'],['🤸 キャラクターの動きで笑いたい','result:human'],['🚗 乗り物でめちゃくちゃになりたい','result:rv'],['🚶 のんびり歩きながら遊びたい','result:bigwalk'],['💣 協力してパニックになりたい','result:ktt']
+  ]}
+};
+
+let node='root';
+let history=[];
+let lastQuestion=null;
+let lastChoices=[];
+
+function snapshot(){ return {node, lastQuestion, lastChoices:[...lastChoices]}; }
+function answer(next){
+  history.push(snapshot());
+  if(next.startsWith('result:')){ showResult(next.slice(7)); }
+  else { node=next; render(); }
+}
+function back(){
+  if(!history.length) return;
+  const s=history.pop();
+  node=s.node; lastQuestion=s.lastQuestion; lastChoices=[...s.lastChoices];
+  render();
+}
+function getNode(id){ return tree[id]; }
+function resultForChoice(next){
+  if(next.startsWith('result:')) return next.slice(7);
+  // Every non-result branch eventually reaches a final choice. Return null rather than guessing.
+  return null;
+}
+function showResult(key){
+  const g=games[key];
+  const alternatives=lastChoices.map((c,idx)=>{
+    const r=resultForChoice(c[1]);
+    return {label:c[0],key:r};
+  });
+  document.getElementById('app').innerHTML=`
+    <div class="resultIcon">${g[1]}</div>
+    <div class="sub">診断結果</div>
+    <div class="resultTitle">${g[0]}</div>
+    <div class="desc">${g[2]}</div>
+    <a class="link" href="${g[3]}" target="_blank" rel="noopener">🎮 Steamページを見る</a>
+    <div class="alt">
+      <div class="altTitle">🔍 最後の質問を変えていたら？</div>
+      ${alternatives.map(a=>a.key ? `<div class="altChoice" onclick="showResult('${a.key}')">${a.label}<div class="mini">→ ${games[a.key][1]} ${games[a.key][0]}</div></div>` : '').join('')}
+    </div>
+    ${history.length ? `<button class="back" onclick="back()">← 一つ前に戻る</button>` : ''}
+    <button class="retry" onclick="restart()">もう一度診断する</button>
+  `;
+}
+function restart(){ node='root';history=[];lastQuestion=null;lastChoices=[];render(); }
+function render(){
+  const q=getNode(node);
+  lastQuestion=q.q;
+  lastChoices=q.choices;
+  document.getElementById('app').innerHTML=`
+    <h1>🎮 ゲーム診断</h1>
+    <div class="sub">直感で選ぶだけ。質問は答えによって変わります。</div>
+    <div class="question">${q.q}</div>
+    <div class="choices">${q.choices.map((c,i)=>`<button class="choice" onclick="answer(tree['${node}'].choices[${i}][1])">${c[0]}</button>`).join('')}</div>
+    ${history.length ? `<button class="back" onclick="back()">← 一つ前に戻る</button>` : ''}
+    <div class="note">候補が絞れたら、その時点で結果が表示されます。</div>
+  `;
+}
+render();
+</script></body></html>
